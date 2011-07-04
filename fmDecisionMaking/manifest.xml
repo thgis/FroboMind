@@ -1,0 +1,16 @@
+<package>
+  <description brief="fmDecisionMaking">
+
+     fmDecisionMaking
+
+  </description>
+  <author>Søren Hundevadt Nielsen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/fmDecisionMaking</url>
+  <depend package="fmMsgs"/>
+  <depend package="fmInterfaces"/>
+
+</package>
+
+

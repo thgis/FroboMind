@@ -1,0 +1,14 @@
+<package>
+  <description brief="fmCore">
+
+     This package containes core functionalities for the FroboMind architecture
+
+  </description>
+  <author>Søren Hundevadt Nielsen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/fmCore</url>
+
+</package>
+
+

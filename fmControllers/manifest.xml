@@ -1,0 +1,16 @@
+<package>
+  <description brief="fmControllers">
+
+     fmControllers
+
+  </description>
+  <author>Søren Hundevadt Nielsen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/fmControllers</url>
+  <depend package="fmMsgs"/>
+  <depend package="fmInterfaces"/>
+
+</package>
+
+

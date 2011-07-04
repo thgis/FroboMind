@@ -1,0 +1,16 @@
+<package>
+  <description brief="fmExtraction">
+
+     fmExtraction
+
+  </description>
+  <author>Søren Hundevadt Nielsen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/fmExtraction</url>
+  <depend package="fmMsgs"/>
+  <depend package="fmInterfaces"/>
+
+</package>
+
+

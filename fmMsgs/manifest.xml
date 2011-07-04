@@ -1,0 +1,14 @@
+<package>
+  <description brief="fmMsgs">
+
+     fmMsgs
+
+  </description>
+  <author>Søren Hundevadt Nielsen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/fmMsgs</url>
+
+</package>
+
+
