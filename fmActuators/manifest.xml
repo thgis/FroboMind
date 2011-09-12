@@ -1,0 +1,16 @@
+<package>
+  <description brief="fmActuators">
+
+     fmActuators
+
+  </description>
+  <author>Søren Hundevadt Nielsen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/fmActuators</url>
+  <depend package="roscpp"/>
+  <depend package="fmMsgs"/>
+
+</package>
+
+
