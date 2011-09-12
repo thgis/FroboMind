@@ -10,6 +10,9 @@
   <url>http://ros.org/wiki/fmActuators</url>
   <depend package="roscpp"/>
   <depend package="fmMsgs"/>
+  <depend package="geometry_msgs"/>
+  <depend package="wiimote"/>
+  <depend package="joy"/>
 
 </package>
 
