@@ -1,0 +1,65 @@
+<launch>
+
+  <group ns="vic_interfaces">
+
+    <node pkg="vic_interfaces" name="COM1" type="serial_node" output="screen" >
+	    <param name="publisher_topic" value="S0_rx" />	 
+	    <param name="subscriber_topic" value="S0_tx" />	
+	    <param name="device" value="/dev/ttyUSB1" />	
+	    <param name="baudrate" value="115200" />
+	</node>
+
+    <node pkg="vic_interfaces" name="COM2" type="serial_node" output="screen" >
+	    <param name="publisher_topic" value="S1_rx" />	 
+	    <param name="subscriber_topic" value="S1_tx" />	
+	    <param name="device" value="/dev/ttyUSB0" />	
+	    <param name="baudrate" value="115200" />
+	</node>
+
+
+  </group>
+
+  <group ns="vic_actuators">
+
+    <node pkg="vic_actuators" name="my_rtq_node1" type="rtq_node" output="screen">
+     	<param name="rtq_command_topic" value="/vic_interfaces/S0_tx" />
+	<!--<param name="rtq_hl_command_topic" value="rtq_command" />-->
+	<!--<param name="rtq_hl_command_topic" value="/wiimote/state" />-->
+	<param name="rtq_hl_command_topic" value="/joy" />
+	<param name="rtq_hl_response_topic" value="/rtq_response_left" />
+	<param name="rtq_response_topic" value="/vic_interfaces/S0_rx" />
+	<param name="rtq_vehicle_side" value="left" />
+	<param name="rtq_com_cycletime" value="0.05" />
+    </node>
+
+    <node pkg="vic_actuators" name="my_rtq_node2" type="rtq_node" output="screen">
+     	<param name="rtq_command_topic" value="/vic_interfaces/S1_tx" />
+	<!--<param name="rtq_hl_command_topic" value="rtq_command" />-->
+	<!--<param name="rtq_hl_command_topic" value="/wiimote/state" />-->
+	<param name="rtq_hl_command_topic" value="/joy" />
+	<param name="rtq_hl_response_topic" value="/rtq_response_right" />
+	<param name="rtq_response_topic" value="/vic_interfaces/S1_rx" />
+	<param name="rtq_vehicle_side" value="right" />
+	<param name="rtq_com_cycletime" value="0.05" /> 
+    </node>
+ 
+  </group>
+
+
+
+    <node pkg="wiimote" type="wiimote_node.py" output="screen" name="armadillo_wii">
+	</node>
+
+    <!-- <node pkg="topic_tools" type="throttle" output="screen" name="rtq_command_throttle"> -->
+	<!-- </node> -->
+
+
+
+    <!-- Test node that sends a changing Twist at 0.33Hz on the topic rtq_command -->
+    <!--<node pkg="vic_actuators" name="my_testnode_rtq" type="testnode_rtq" output="screen">-->
+    <!--	<param name="publisher_topic" value="/vic_actuators/rtq_command" />-->
+    <!--</node> -->
+
+
+
+</launch>

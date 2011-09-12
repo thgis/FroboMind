@@ -1,0 +1,50 @@
+<launch>
+
+
+  <group ns="fmInterfaces">
+    <node pkg="vic_interfaces" name="COM1" type="serial_node" >
+	    <param name="publisher_topic" value="S0_rx" />	 
+	    <param name="subscriber_topic" value="S0_tx" />	
+	    <param name="device" value="/dev/ttyS0" />	
+	    <param name="baudrate" value="115200" />
+	</node>
+
+        <node pkg="vic_interfaces" name="CAN0" type="can_node" >
+	    <param name="device" value="/dev/can0" />	
+	    <param name="publisher_topic" value="can0_rx" />
+	    <param name="subscriber_topic" value="can0_tx" />
+	</node>
+
+  </group>
+  <group ns="fmSensorsFeedback">
+   # <node pkg="wiimote" name="wiimote_node" type="wiimote_node.py" respawn="true" />
+
+    	<node pkg="vic_sensors" name="imu_parser" type="sduimu_node">
+	    	<param name="subscribe_topic_id" value="/fmInterfaces/S0_rx" />	
+		<param name="publish_topic_id" value="imu_msg" />	 
+	</node>
+        <node pkg="vic_sensors" name="lms111_front" type="lms111_node">
+	    	<param name="host" value="192.168.0.10" />	
+		<param name="topic_id" value="lidar1" />	 
+	</node>
+	<node pkg="vic_sensors" name="lms111_back" type="lms111_node">
+		<param name="host" value="192.168.0.13" />	
+		<param name="topic_id" value="lidar2" />
+	</node>
+  </group>
+  <group ns="vic_estimators">
+
+  </group>
+  <group ns="vic_controlers">
+
+  </group>
+
+		
+
+  <group ns="fmNavigationActuation">
+    <node pkg="vic_actuators" name="aes25_node" type="aes_node" output="screen">
+     	<param name="publisher_topic" value="/fmInterfaces/can0_tx" />
+	<param name="subscriber_topic" value="/fmInterfaces/can0_rx" />
+    </node> 
+  </group>
+</launch>

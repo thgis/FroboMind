@@ -1,0 +1,80 @@
+<launch>
+
+    <node pkg="wiimote" name="wiimote_node" type="wiimote_node.py" output="screen"  />
+
+  <group ns="vic_interfaces">
+    <node pkg="vic_interfaces" name="COM1" type="serial_node" >
+	    <param name="publisher_topic" value="S0_rx" />	 
+	    <param name="subscriber_topic" value="S0_tx" />	
+	    <param name="device" value="/dev/ttyS0" />	
+	    <param name="baudrate" value="115200" />
+	</node>
+
+        <node pkg="vic_interfaces" name="CAN0" type="can_node" >
+	    <param name="device" value="/dev/can0" />	
+	    <param name="publisher_topic" value="can0_rx" />
+	    <param name="subscriber_topic" value="can0_tx" />
+	</node>
+        <node pkg="vic_interfaces" name="CAN1" type="can_node" >
+            <param name="device" value="/dev/can1" />
+            <param name="publisher_topic" value="can1_rx" />
+            <param name="subscriber_topic" value="can1_tx" />
+        </node>
+
+
+  </group>
+ 
+        <node pkg="vic_sensors" name="lms111_front" type="lms111_node" output="screen">
+	    	<param name="host" value="192.168.0.11" />	
+		<param name="topic_id" value="/base_scan" />
+		<param name="frame_id" value="/laser_link" />	 
+	</node>
+
+  <group ns="vic_sensors">
+    	<node pkg="vic_sensors" name="imu_parser" type="sduimu_node">
+	    	<param name="subscribe_topic_id" value="/vic_interfaces/S0_rx" />	
+		<param name="publish_topic_id" value="imu_msg" />	 
+	</node>
+    <node pkg="vic_sensors" name="llencoder_node_right" type="llencoder_node">
+     	<param name="publisher_topic" value="/vic_interfaces/can0_tx" />
+	<param name="enc_publisher_topic" value="/vic_sensors/encoder_right" />
+	<param name="subscriber_topic" value="/vic_interfaces/can0_rx" />
+        <param name="encoder_id" value="22" />
+    </node> 
+    <node pkg="vic_sensors" name="llencoder_node_left" type="llencoder_node">
+        <param name="publisher_topic" value="/vic_interfaces/can0_tx" />
+        <param name="enc_publisher_topic" value="/vic_sensors/encoder_left" />
+        <param name="subscriber_topic" value="/vic_interfaces/can0_rx" />
+        <param name="encoder_id" value="11" />
+    </node>
+
+
+
+  </group>
+	 <node pkg="vic_estimators" name="orchard_detector" type="orchard_detector"  >
+        <param name="subscriber_topic" value="/base_scan" />
+   	</node>
+  <group ns="vic_estimators">
+  </group>
+
+
+  <group ns="vic_controlers">
+  </group>3
+
+		
+
+  <group ns="vic_actuators">
+    <node pkg="vic_actuators" name="aes25_node" type="aes_node" output="screen">
+        <param name="publisher_topic" value="/vic_interfaces/can0_tx" />
+        <param name="subscriber_topic" value="/vic_interfaces/can0_rx" />
+    </node>
+
+
+  </group>
+
+
+<node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="1.2 0 0.2 0 0 0 base_link laser_link 100" />
+<node pkg="tf" type="static_transform_publisher" name="link2_broadcaster" args="0.1 0 0 0 0 0 base_footprint base_link 100" />
+
+</launch>
+

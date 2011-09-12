@@ -1,0 +1,30 @@
+<launch>
+
+        <node pkg="bumblebee2" type="bumblebee2" name="bumblebee2" output="screen" respawn="false">
+                <param name="video_mode" value="format7_3" />
+                <param name="fps" value="1" />
+                <param name="gain" value="4305" />
+                <param name="brightness" value="4096" />
+                <param name="whitebalance" value="auto" />
+                <param name="shutter" value="256" />
+                <param name="exposure" value="555" />
+                <param name="bayer_pattern" value="none" />
+                <param name="bayer_method" value="none" />
+        </node>
+
+
+	
+	<!-- YOYOYOYO Søren -->
+
+	<!-- <node pkg="topic_tools" type="throttle" output="screen" name="rtq_command_throttle"> -->
+	<!-- </node> -->
+
+
+
+	<!-- Test node that sends a changing Twist at 0.33Hz on the topic rtq_command -->
+	<!--<node pkg="vic_actuators" name="my_testnode_rtq" type="testnode_rtq" output="screen">-->
+	<!--	<param name="publisher_topic" value="/vic_actuators/rtq_command" />-->
+	<!--</node> -->
+
+</launch>
+
