@@ -9,6 +9,9 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/fmKinematics</url>
   <depend package="roscpp"/>
+    <depend package="wiimote"/>
+      <depend package="joy"/>
+      <depend package="geometry_msgs"/>
   <depend package="fmMsgs"/>
 
 </package>
