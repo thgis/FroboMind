@@ -1,120 +1,79 @@
 <launch>
-	<group ns="vic_interfaces">
+	<group ns="fmSensors">
+	</group>
 
-		<node pkg="vic_interfaces" name="COM1" type="serial_node" output="screen" >
-			<param name="publisher_topic" value="S0_rx" />	 
-			<param name="subscriber_topic" value="S0_tx" />	
-			<param name="device" value="/dev/ttyS0" />	
-			<param name="baudrate" value="115200" />
-		</node>
-		<node pkg="vic_interfaces" name="COM2" type="serial_node" output="screen" >
-			<param name="publisher_topic" value="S1_rx" />	 
-			<param name="subscriber_topic" value="S1_tx" />	
-			<param name="device" value="/dev/ttyS1" />	
-			<param name="baudrate" value="115200" />
-		</node>
-		<node pkg="vic_interfaces" name="COM3" type="serial_node" output="screen" >
-			<param name="publisher_topic" value="S2_rx" />	 
-			<param name="subscriber_topic" value="S2_tx" />	
-			<param name="device" value="/dev/ttyS2" />	
-			<param name="baudrate" value="115200" />
+	<group ns="fmExtractors">
+		    <node pkg="fmExtractors" type="lidar_row_detector" name="lidar_row_detector" /> 
+	</group>
+
+	<group ns="fmProcessors">
+		<node pkg="fmProcessors" type="husmands_kalman" name="kf_rows" /> 
+	</group>
+
+ 	<group ns="fmDecisionMakers">
+		<node pkg="fmDecisionMakers" type="BS" name="behaviour_selector" />
+	</group>
+
+	<group ns="fmExecutors">
+	</group>
+
+	<group ns="fmControllers">
+		<node pkg="fmControllers" type="IN_ROW_NAV" name="in_row_navigator" output="screen">  
+ 			<param name="maize_sub" value="/fmProcessors/kf_rows/kalman_row_estimate" />
 		</node>
 	</group>
 
- 	 <group ns="vic_sensors">
-        	<node pkg="vic_sensors" name="imu_parser" type="sduimu_node">
-                	<param name="subscribe_topic_id" value="/vic_interfaces/S2_rx" />
-               		<param name="publish_topic_id" value="imu_msg" />
-			<param name="frame_id" value="/base_link" />
-        	</node>
-        	<node pkg="vic_sensors" name="lms111_front" type="lms111_node">
-                	<param name="host" value="192.168.0.11" />
-                	<param name="topic_id" value="laser_msgs_front" />
-                	<param name="frame_id" value="/laser_front_link" />
-        	</node>
-        	<node pkg="vic_sensors" name="lms111_rear" type="lms111_node">
-                	<param name="host" value="192.168.0.13" />
-                	<param name="topic_id" value="laser_msgs_rear" />
-                	<param name="frame_id" value="/laser_rear_link" />
-        	</node>
-	</group>
-
-
-
-
-
- 	<group ns="vic_actuators">
-
-		<node pkg="vic_actuators" name="my_rtq_node_left" type="rtq_node">
-			<param name="rtq_command_topic" value="/vic_interfaces/S0_tx" />
-			<!--<param name="rtq_hl_command_topic" value="rtq_command" />-->
-			<!--<param name="rtq_hl_command_topic" value="/wiimote/state" />-->
-			<param name="rtq_hl_command_topic" value="/rtq_command_left" />
+ 	<group ns="fmActuators">
+		<node pkg="fmActuators" name="roboteq_node_left" type="roboteq_node">
+			<param name="rtq_command_topic" value="/fmBSP/motor_left_tx" />
+			<param name="rtq_hl_command_topic" value="/fmKinematics/rtq_command_left" />
 			<param name="rtq_hl_response_topic" value="/rtq_response_left" />
-			<param name="rtq_response_topic" value="/vic_interfaces/S0_rx" />
+			<param name="rtq_resnponse_topic" value="/fmBSP/motor_left_rx" />
 			<param name="rtq_vehicle_side" value="left" />
 			<param name="rtq_com_cycletime" value="0.05" />
 			<param name="deadmanbutton_topic" value="/joy"/>
 		</node>
 
-		<node pkg="vic_actuators" name="my_rtq_node_righ" type="rtq_node" >
-			<param name="rtq_command_topic" value="/vic_interfaces/S1_tx" />
-			<!--<param name="rtq_hl_command_topic" value="rtq_command" />-->
+		<node pkg="fmActuators" name="roboteq_node_right" type="roboteq_node" >
+			<param name="rtq_command_topic" value="/fmBSP/motor_right_tx" />
+			<!--<param name="rtq_hl_command_topic" value="/rtq_command" />-->
 			<!--<param name="rtq_hl_command_topic" value="/wiimote/state" />-->
-			<param name="rtq_hl_command_topic" value="/rtq_command_right" />
+			<param name="rtq_hl_command_topic" value="/fmKinematics/rtq_command_right" />
 			<param name="rtq_hl_response_topic" value="/rtq_response_right" />
-			<param name="rtq_response_topic" value="/vic_interfaces/S1_rx" />
+			<param name="rtq_response_topic" value="/fmBSP/motor_right_rx" />
 			<param name="rtq_vehicle_side" value="right" />
 			<param name="rtq_com_cycletime" value="0.05" />
 			<param name="deadmanbutton_topic" value="/joy"/>
 		</node>
-
-		<node pkg="vic_actuators" name="my_armadillo_ifk" type="armadillo_ifk">
-			<!-- <param name="hl_publisher_topic" value="" /> -->
-			<param name="hl_subscriber_topic" value="/cmd_vel"/>
-			<param name="ll_publisher_topic_left" value="/rtq_command_left" />
-			<param name="ll_publisher_topic_right" value="/rtq_command_right" />
-			
-			<!-- <param name="ll_subscriber_topic_left" value="" /> -->
-			<!-- <param name="ll_subscriber_topic_right" value="" /> -->
-		</node>
-
-
-		<node pkg="vic_actuators" name="my_wiimote_to_twist" type="wiimote_to_twist" >
-			<param name="max_angular_velocity" value="3.58" />
-			<param name="max_linear_velocity" value="2.7" />
-			<param name="x_axis" value="1" />
-			<param name="y_axis" value="0" />
-			<param name="z_axis" value="2" />
-			<param name="subscriber_topic" value="/joy" />
-			<param name="publisher_topic" value="/wii_cmd_vel" />
-		</node>
-
  	</group>
 
-    <node pkg="vic_controllers" type="IN_ROW_NAV" name="in_row_navigator" output="screen"/> 
-    <node pkg="vic_estimators" type="maize_detector" name="maize_detector"  />
-    <node pkg="vic_estimators" type="husmands_kalman" name="kf_rows" />
-    <node pkg="vic_controllers" type="BS" name="behaviour_selector" />
+ 	<group ns="fmKinematics">
+		<node pkg="fmKinematics" name="armadillo_ifk" type="armadillo_ifk">
+			<param name="hl_subscriber_topic" value="/cmd_vel"/>
+			<param name="ll_publisher_topic_left" value="/fmKinematics/rtq_command_left" />
+			<param name="ll_publisher_topic_right" value="/fmKinematics/rtq_command_right" />
+		</node>
+	</group>
 
-    <node pkg="vic_estimators" type="rotate_base_server" name="rotate_base"  />
-    <node pkg="wiimote" type="wiimote_node.py" output="screen" name="armadillo_wii"></node>
-    <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="-0.6735 0 0.23 0 3.1416 0 base_link laser_rear_link 100" />
-    <node pkg="tf" type="static_transform_publisher" name="link2_broadcaster" args="0.6735 0 0.23 0 0 3.1416 base_link laser_front_link 100" />
-
-
-	
-	<!-- YOYOYOYO Søren -->
-
-	<!-- <node pkg="topic_tools" type="throttle" output="screen" name="rtq_command_throttle"> -->
-	<!-- </node> -->
-
-
-
-	<!-- Test node that sends a changing Twist at 0.33Hz on the topic rtq_command -->
-	<!--<node pkg="vic_actuators" name="my_testnode_rtq" type="testnode_rtq" output="screen">-->
-	<!--	<param name="publisher_topic" value="/vic_actuators/rtq_command" />-->
-	<!--</node> -->
-
+	<group ns="fmBSP">
+		<node pkg="fmBSP" name="COM1" type="serial_node" output="screen" >
+			<param name="publisher_topic" value="motor_left_rx" />	 
+			<param name="subscriber_topic" value="motor_left_tx" />	
+			<param name="device" value="/dev/ttyS0" />	
+			<param name="baudrate" value="115200" />
+		</node>
+		<node pkg="fmBSP" name="COM2" type="serial_node" output="screen" >
+			<param name="publisher_topic" value="motor_right_rx" />	 
+			<param name="subscriber_topic" value="motor_right_tx" />	
+			<param name="device" value="/dev/ttyS1" />	
+			<param name="baudrate" value="115200" />
+		</node>
+		<node pkg="fmBSP" name="COM3" type="serial_node" output="screen" >
+			<param name="publisher_topic" value="gps_rx" />	 
+			<param name="subscriber_topic" value="gps_tx" />	
+			<param name="device" value="/dev/ttyS2" />	
+			<param name="baudrate" value="4800" />
+		</node>
+	</group>
 </launch>
 
