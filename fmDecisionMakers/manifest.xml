@@ -8,9 +8,8 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/fmDecisionMaking</url>
-  <depend package="fmMsgs"/>
-  <depend package="fmInterfaces"/>
-
+  <depend package="roscpp"/>
+  <depend package="joy"/>
 </package>
 
 
