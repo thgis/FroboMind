@@ -9,8 +9,10 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/fmProcessing</url>
   <depend package="fmMsgs"/>
-  <depend package="fmInterfaces"/>
-
+  <depend package="fmBSP"/>
+  <depend package="sensor_msgs"/>
+  <depend package="visualization_msgs"/>
+  <depend package="tf"/>
 </package>
 
 
