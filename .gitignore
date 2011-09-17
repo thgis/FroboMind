@@ -37,6 +37,7 @@ Thumbs.db
 .cproject
 .project
 .pydevproject
+_*.*
 cmake_install.cmake
 build/
 bin/
