@@ -8,7 +8,14 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/fmExtraction</url>
+
+  <depend package="geometry_msgs"/>
+  <depend package="tf"/>
+  <depend package="joy"/>
+  <depend package="wiimote"/>
+
   <depend package="fmMsgs"/>
+
   <depend package="sensor_msgs"/>
   <depend package="laser_geometry"/>
   <depend package="laser_filters"/>
@@ -16,6 +23,10 @@
   <depend package="opencv2"/>
   <depend package="cv_bridge"/>
   <depend package="visualization_msgs"/>
+
+  <depend package="fmBSP"/>
+
+
 </package>
 
 

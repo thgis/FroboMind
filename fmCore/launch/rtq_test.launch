@@ -1,15 +1,15 @@
 <launch>
 
-	<group ns="vic_interfaces">
+	<group ns="fmBSP">
 
-		<node pkg="vic_interfaces" name="COM1" type="serial_node" output="screen" >
+		<node pkg="fmBSP" name="COM1" type="serial_node" output="screen" >
 			<param name="publisher_topic" value="S0_rx" />	 
 			<param name="subscriber_topic" value="S0_tx" />	
 			<param name="device" value="/dev/ttyUSB1" />	
 			<param name="baudrate" value="115200" />
 		</node>
 
-		<node pkg="vic_interfaces" name="COM2" type="serial_node" output="screen" >
+		<node pkg="fmBSP" name="COM2" type="serial_node" output="screen" >
 			<param name="publisher_topic" value="S1_rx" />	 
 			<param name="subscriber_topic" value="S1_tx" />	
 			<param name="device" value="/dev/ttyUSB0" />	
@@ -18,37 +18,38 @@
 
 	</group>
 
-	<group ns="vic_actuators">
+	<group ns="fmActuators">
 
-		<node pkg="vic_actuators" name="my_rtq_node_left" type="rtq_node" output="screen">
-			<param name="rtq_command_topic" value="/vic_interfaces/S0_tx" />
+		<node pkg="fmActuators" name="my_rtq_node_left" type="roboteq_node" output="screen">
+			<param name="rtq_command_topic" value="/fmBSP/S0_tx" />
 			<!--<param name="rtq_hl_command_topic" value="rtq_command" />-->
 			<!--<param name="rtq_hl_command_topic" value="/wiimote/state" />-->
 			<param name="rtq_hl_command_topic" value="/rtq_command_left" />
 			<param name="rtq_hl_response_topic" value="/rtq_response_left" />
-			<param name="rtq_response_topic" value="/vic_interfaces/S0_rx" />
+			<param name="rtq_response_topic" value="/fmBSP/S0_rx" />
 			<param name="rtq_vehicle_side" value="left" />
-			<param name="rtq_com_cycletime" value="0.05" />
+			<param name="rtq_com_cycletime" value="1.0" />
 			<param name="deadmanbutton_topic" value="/joy"/>
 			<param name="rtq_lamp_command_topic" value="/rtq_lamp_command_left" />
 		</node>
 
-		<node pkg="vic_actuators" name="my_rtq_node_righ" type="rtq_node" output="screen">
-			<param name="rtq_command_topic" value="/vic_interfaces/S1_tx" />
+		<node pkg="fmActuators" name="my_rtq_node_righ" type="roboteq_node" output="screen">
+			<param name="rtq_command_topic" value="/fmBSP/S1_tx" />
 			<!--<param name="rtq_hl_command_topic" value="rtq_command" />-->
 			<!--<param name="rtq_hl_command_topic" value="/wiimote/state" />-->
 			<param name="rtq_hl_command_topic" value="/rtq_command_right" />
 			<param name="rtq_hl_response_topic" value="/rtq_response_right" />
-			<param name="rtq_response_topic" value="/vic_interfaces/S1_rx" />
+			<param name="rtq_response_topic" value="/fmBSP/S1_rx" />
 			<param name="rtq_vehicle_side" value="right" />
-			<param name="rtq_com_cycletime" value="0.05" />
+			<!--<param name="rtq_com_cycletime" value="0.05" /> -->
+			<param name="rtq_com_cycletime" value="1.0" />
 			<param name="deadmanbutton_topic" value="/joy"/>
 			<param name="rtq_lamp_command_topic" value="/rtq_lamp_command_right" />
 			<!-- <param name="wiimote_rumble_led_topic" value="/joy"/> -->
 			
 		</node>
 
-		<node pkg="vic_actuators" name="my_armadillo_ifk" type="armadillo_ifk" output="screen">
+		<node pkg="fmKinematics" name="my_armadillo_ifk" type="armadillo_ifk" output="screen">
 			<!-- <param name="hl_publisher_topic" value="" /> -->
 			<param name="hl_subscriber_topic" value="/wii_cmd_vel"/>
 			<param name="ll_publisher_topic_left" value="/rtq_command_left" />
@@ -61,7 +62,7 @@
 		</node>
 
 
-		<node pkg="vic_actuators" name="my_wiimote_to_twist" type="wiimote_to_twist" output="screen">
+		<node pkg="fmExtractors" name="my_wiimote_to_twist" type="wiimote_to_twist" output="screen">
 			<param name="max_angular_velocity" value="3.58" />
 			<param name="max_linear_velocity" value="2.7" />
 			<param name="x_axis" value="1" />

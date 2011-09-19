@@ -30,7 +30,7 @@
 # File:     serial_node.cpp                                            
 # Purpose:  Create a interface node to handle serial communication
 # Project:  vic_interfaces
-# Author:   Anders Bøgild <soeni05@gmail.com>
+# Author:   Anders Bøgild <andb@mmmi.sdu.dk>
 # Created:  Mar 01, 2011 Anders Bøgild, Source copied from ...
 *************************************************************************************/
 #include <string>
@@ -79,9 +79,10 @@ ros::Subscriber my_lamp_command_subscriber;
 
 
 bool vehicle_left_side = false;
+bool rtq_configured = false;
 unsigned int wii_repport_count = 0;
 unsigned int rtq_com_timer_count = 0;
-unsigned int rtq_com_timer_inq_dly = 0;
+unsigned int rtq_com_timer_slot = 0;
 int motor_command_G = 0;
 
 
@@ -175,48 +176,51 @@ void rtqComTimerCallback(const ros::TimerEvent& e)
   //ROS_INFO("rtqComTimerCallback");
   std::stringstream ss;
 
-  // Throtteling to 20% of timer rate
-  if ((rtq_com_timer_count++) % 6)
+  //Dont send anything if the roboteq is not yet configured
+  if (rtq_configured == false ){
+    ROS_INFO("rtq_not configured");
+    return;
+  }
+
+
+  // Put each roboteq command into its own slot pr. cycletime
+  //ROS_INFO("rtqComTimerCallback %d", rtq_com_timer_slot);
+  switch ((rtq_com_timer_slot++) % 5)
   {
 
-    // Request data in period with no motor commands
-    //ROS_INFO("rtqComTimerCallback %d", rtq_com_timer_inq_dly);
-    switch (rtq_com_timer_inq_dly++)
-    {
+    case 0: //set IO port 1 and 2
+      //ss << "?CB";
 
-      case 0:
-        //ss << "?CB";
+      if (rtqLampRed){
+        ss << "!D1 1";
+      }else{
+        ss << "!D0 1";
+      }
 
-        if (rtqLampRed){
-          ss << "!D1 1";
-        }else{
-          ss << "!D0 1";
-        }
+      ss << "_";
 
-        ss << "_";
+      if (rtqLampYellow){
+        ss << "!D1 2";
+      }else{
+        ss << "!D0 2";
+      }
+      break;
 
-        if (rtqLampYellow){
-          ss << "!D1 2";
-        }else{
-          ss << "!D0 2";
-        }
+    case 1: //ask for relative number of commutations, a.k.a. speed
+      ss << "?CBR";
+      break;
+
+    case 2: //ask for motor power (?)
+      ss << "?M";
         break;
 
-      case 1:
-        ss << "?CBR";
-        break;
+    case 3: //ask for battery voltage
+      ss << "?V 2";
+      break;
 
-      case 2:
-        ss << "?M";
-        break;
-
-      case 3:
-        ss << "?V 2";
-        break;
-
-      case 4:
-        ss << "!G " << motor_command_G;
-        break;
+    case 4: //send motor command
+      ss << "!G " << motor_command_G;
+      break;
 
     }
 
@@ -225,10 +229,8 @@ void rtqComTimerCallback(const ros::TimerEvent& e)
     s_tx_msg_.data = ss.str();
     my_command_publisher.publish(s_tx_msg_);
 
-    return;
-  }
 
-  rtq_com_timer_inq_dly = 0;
+    //rtq_com_timer_slot = 0;
 
 }
 
@@ -316,43 +318,46 @@ void callbackHandlerRtqResponse(const fmMsgs::serial::ConstPtr& msg)
   double battery_volts = 0;
   double rtq_ver = 0;
 
-  //ROS_INFO("RoboteQ : '%s'",msg->data.c_str());
+  ROS_INFO("RoboteQ : '%s'",msg->data.c_str());
 
-  if (sscanf(msg->data.c_str(), "CB=%d", &counter) == 1)
-  {
-    if (vehicle_left_side) counter=-counter;
-    rtq_msg.BrushlessCounter = counter;
-  }
+  if (rtq_configured == true){
+    if (sscanf(msg->data.c_str(), "CB=%d", &counter) == 1)
+    {
+      if (vehicle_left_side) counter=-counter;
+      rtq_msg.BrushlessCounter = counter;
+    }
 
-  else if (sscanf(msg->data.c_str(), "CBR=%d", &counter_relative) == 1)
-  {
-    if (vehicle_left_side) counter_relative=-counter_relative;
-    rtq_msg.BrushlessCounterRelative = counter_relative;
-  }
+    else if (sscanf(msg->data.c_str(), "CBR=%d", &counter_relative) == 1)
+    {
+      if (vehicle_left_side) counter_relative=-counter_relative;
+      rtq_msg.BrushlessCounterRelative = counter_relative;
+    }
 
-  else if (sscanf(msg->data.c_str(), "M=%d", &ampere) == 1)
-  {
-    if (vehicle_left_side) ampere=-ampere;
-    rtq_msg.BatteryAmpere = ampere;
-  }
+    else if (sscanf(msg->data.c_str(), "M=%d", &ampere) == 1)
+    {
+      if (vehicle_left_side) ampere=-ampere;
+      rtq_msg.BatteryAmpere = ampere;
+    }
 
-  else if (sscanf(msg->data.c_str(), "V=%lf", &battery_volts) == 1)
-  {
-    //ROS_INFO("Got volts %f", battery_volts);
-    rtq_msg.BatteryVoltage = battery_volts / 10.0;
-  }
-
-  else if (sscanf(msg->data.c_str(), "FID=Roboteq v%lf RCB200 09/04/2010", &rtq_ver) == 1)
-  {
-    if (rtq_ver == 1.2){
-      ROS_INFO("RoboteQ controller online, initializing");
-      init_rtq();
-    }else{
-      ROS_ERROR("Unsupported firmware version '%lf' found on RoboteQ controller",rtq_ver);
+    else if (sscanf(msg->data.c_str(), "V=%lf", &battery_volts) == 1)
+    {
+      //ROS_INFO("Got volts %f", battery_volts);
+      rtq_msg.BatteryVoltage = battery_volts / 10.0;
     }
   }
-
-
+  else //if rtq_configured == false
+  {
+    if (sscanf(msg->data.c_str(), "FID=Roboteq v%lf RCB200 09/04/2010", &rtq_ver) == 1)
+    {
+      if (rtq_ver == 1.2){
+        ROS_INFO("RoboteQ controller online, initializing");
+        init_rtq();
+        rtq_configured = true;
+      }else{
+        ROS_ERROR("Unsupported firmware version '%lf' found on RoboteQ controller",rtq_ver);
+      }
+    }
+  }
 
   // Maybe a bad idea, data can be 3 iterations old..
   rtq_msg.header.stamp = ros::Time::now();
@@ -389,7 +394,7 @@ int main(int argc, char **argv)
   n.param<std::string>("rtq_response_topic", rtq_response_topic, "S0_rx_msg"); //we subscribe to the response from the RoboteQ controller box
   n.param<std::string>("rtq_hl_response_topic", rtq_hl_response_topic, "rtq_response_msg"); //we the response from
   n.param<std::string>("rtq_vehicle_side", rtq_vehicle_side, "none"); //we subscribe to the response from the rooteq controller
-  n.param<double>("rtq_com_cycletime",rtq_com_cycletime, 1.0);
+  n.param<double>("rtq_com_cycletime",rtq_com_cycletime, 1.0); //cycle time in seconds
   n.param<std::string>("deadmanbutton_topic", deadmanbutton_topic, "deadmanbutton_topic");
   n.param<std::string>("rtq_lamp_command_topic",rtq_lamp_command_topic,"rtq_lamp_command_topic");
   //n.param<std::string>("wiimote_rumble_led_topic",wiimote_rumble_led_topic,"wiimote_rumble_led_topic");
@@ -431,7 +436,7 @@ int main(int argc, char **argv)
   while ( ! my_command_publisher.getNumSubscribers() ){
   	ROS_WARN_THROTTLE(1,"Waiting for serial_node to subscribe");
   }
-  init_rtq(); // in case we dumped in on a freshly started node and dont catch the init string
+  //init_rtq(); // in case we dumped in on a freshly started node and dont catch the init string
 
   // Look at relevant actions
   //ac = new actionlib::SimpleActionClient<vic_estimators::rotateAction>("/rotate_base", true);
