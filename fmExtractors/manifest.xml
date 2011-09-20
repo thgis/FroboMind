@@ -11,8 +11,6 @@
 
   <depend package="geometry_msgs"/>
   <depend package="tf"/>
-  <depend package="joy"/>
-  <depend package="wiimote"/>
 
   <depend package="fmMsgs"/>
 
@@ -23,9 +21,6 @@
   <depend package="opencv2"/>
   <depend package="cv_bridge"/>
   <depend package="visualization_msgs"/>
-
-  <depend package="fmBSP"/>
-
 
 </package>
 

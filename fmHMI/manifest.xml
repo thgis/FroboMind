@@ -11,6 +11,12 @@
   <depend package="roscpp"/>
   <depend package="fmMsgs"/>
 
+  <depend package="geometry_msgs"/>
+  <depend package="tf"/>
+  <depend package="joy"/>
+  <depend package="wiimote"/>
+
+
 </package>
 
 
