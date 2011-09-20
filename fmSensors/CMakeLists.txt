@@ -21,8 +21,8 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
-rosbuild_add_executable(sduimu_node src/inertial_measurement_units/sduimu_node.cpp)
-rosbuild_add_executable(lms111_node src/laser_range_scanners/lms111_node.cpp)
+rosbuild_add_executable(sduimu_node src/global_sensors/sduimu_node.cpp)
+rosbuild_add_executable(lms111_node src/local_sensors/lms111_node.cpp)
 
 include_directories(/usr/include/)
 link_directories(/usr/lib/)
