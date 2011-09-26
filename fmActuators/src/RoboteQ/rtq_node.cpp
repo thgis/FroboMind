@@ -402,7 +402,7 @@ void callbackHandlerRtqResponse(const fmMsgs::serial::ConstPtr& msg)
       }else{
         ROS_ERROR("Unsupported firmware version '%lf' found on Roboteq controller",rtq_ver);
       }
-    }else if(sscanf(msg->data.c_str(), "ECOFF %d", &ecoff_val) == 1){
+    }else if(sscanf(msg->data.c_str(), "^ECHOF %d", &ecoff_val) == 1){
       if (ecoff_val == 1){
         rtq_configured = true;
         rtq_watchdog_reset();
