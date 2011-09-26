@@ -28,7 +28,7 @@
 			<param name="rtq_hl_response_topic" value="/rtq_response_left" />
 			<param name="rtq_response_topic" value="/fmBSP/S0_rx" />
 			<param name="rtq_vehicle_side" value="left" />
-			<param name="rtq_com_cycletime" value="1.0" />
+			<param name="rtq_com_cycletime" value="0.05" />
 			<param name="deadmanbutton_topic" value="/joy"/>
 			<param name="rtq_lamp_command_topic" value="/rtq_lamp_command_left" />
 		</node>
@@ -41,8 +41,8 @@
 			<param name="rtq_hl_response_topic" value="/rtq_response_right" />
 			<param name="rtq_response_topic" value="/fmBSP/S1_rx" />
 			<param name="rtq_vehicle_side" value="right" />
-			<!--<param name="rtq_com_cycletime" value="0.05" /> -->
-			<param name="rtq_com_cycletime" value="1.0" />
+			<param name="rtq_com_cycletime" value="0.05" /> 
+			<!--<param name="rtq_com_cycletime" value="1.0" /> -->
 			<param name="deadmanbutton_topic" value="/joy"/>
 			<param name="rtq_lamp_command_topic" value="/rtq_lamp_command_right" />
 			<!-- <param name="wiimote_rumble_led_topic" value="/joy"/> -->
@@ -72,8 +72,8 @@
 			<param name="publisher_topic" value="/wii_cmd_vel" />
 		</node>
 
- 	</group>
-
+ 	</group
+>T
     <node pkg="wiimote" type="wiimote_node.py" output="screen" name="armadillo_wii" respawn="true"></node>
 
 	<!-- <node pkg="topic_tools" type="throttle" output="screen" name="rtq_command_throttle"> -->
