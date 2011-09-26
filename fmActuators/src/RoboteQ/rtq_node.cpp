@@ -55,6 +55,9 @@
 
 #include <boost/regex.hpp>
 
+#include "rtq_node.hpp"
+
+
 /* ros messages */
 fmMsgs::serial s_rx_msg_;
 fmMsgs::serial s_tx_msg_;
@@ -139,6 +142,7 @@ int count = 0;
 bool deadManActive = false;
 bool slowMoveActive = false;
 bool turnModeActive = false;
+
 void callbackHandlerDeadManBtn(const sensor_msgs::Joy::ConstPtr& joy)
 {
   //ROS_INFO("W");
@@ -154,6 +158,10 @@ void callbackHandlerDeadManBtn(const sensor_msgs::Joy::ConstPtr& joy)
   }else{
     deadManActive = false;
   }
+
+
+  wii_watchdog(joy);
+
 
   //testing the gyro
   if ( (joy->buttons[WII_BTN_HOME]) && (turnModeActive==false) ){
@@ -187,6 +195,47 @@ void callbackHandlerDeadManBtn(const sensor_msgs::Joy::ConstPtr& joy)
     */
   }
 }
+
+// Wiimote watchdog
+float x_prev,y_prev,z_prev;
+int wii_watchdog_count = 0;
+int wii_watchdog_limit = 30;
+
+void wii_watchdog_reset(){
+  wii_watchdog_count = 0;
+}
+
+void wii_watchdog(const sensor_msgs::Joy::ConstPtr& joy){
+
+  // Detect if the wiimote link is active based on accelerometer noise
+  // (the wiimote node is very slow at detecting if wiimote is out of range or has been lost)
+  if ( ((joy -> axes[0]) == x_prev) && ((joy -> axes[1]) == y_prev) && ((joy -> axes[2]) == z_prev)){
+
+    wii_watchdog_count++;
+
+    if (wii_watchdog_count > wii_watchdog_limit){
+
+      if (vehicle_left_side)
+          ROS_ERROR_THROTTLE(1,"Wii watchdog triggered for Roboteq controller [left] - declaring emergency stop!");
+        else
+          ROS_ERROR_THROTTLE(1,"Wii Watchdog triggered for Roboteq controller [right] - declaring emergency stop!");
+
+      deadManActive = false;
+
+      //TODO: Raise emergency stop !
+
+    }
+
+  }else{
+    wii_watchdog_reset();
+  }
+
+  x_prev = joy -> axes[0];
+  y_prev = joy -> axes[1];
+  z_prev = joy -> axes[2];
+
+}
+
 
 void callbackHandlerLampCommand(const fmMsgs::rtq_lamp_command::ConstPtr& lamp_command_msg){
 
@@ -500,6 +549,8 @@ int main(int argc, char **argv)
   // wait for the action server to start
   //ac->waitForServer(); //will wait for infinite time
 
+
+  // Play with detecting if wiimote has been lost
 
   // Play with the WII LED's
 /*
