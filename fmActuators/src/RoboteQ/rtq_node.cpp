@@ -123,9 +123,9 @@ void rtq_watchdog(){
     rtq_configured = false;
 
     if (vehicle_left_side)
-      ROS_WARN("Watchdog triggered for Roboteq controller [left] - declaring emergency stop!");
+      ROS_ERROR("Watchdog triggered for Roboteq controller [left] - declaring emergency stop!");
     else
-      ROS_WARN("Watchdog triggered for Roboteq controller [right] - declaring emergency stop!");
+      ROS_ERROR("Watchdog triggered for Roboteq controller [right] - declaring emergency stop!");
 
     //TODO: Raise emergency stop !
 
@@ -206,9 +206,9 @@ void rtqComTimerCallback(const ros::TimerEvent& e)
   //Dont send anything if the roboteq is not yet configured
   if (rtq_configured == false ){
     if (vehicle_left_side)
-      ROS_INFO("Roboteq controller [left] not configured (emergency stop pressed?)");
+      ROS_WARN_THROTTLE(2,"Roboteq controller [left] not configured (emergency stop pressed?)");
     else
-      ROS_INFO("Roboteq controller [right] not configured (emergency stop pressed?)");
+      ROS_WARN_THROTTLE(2,"Roboteq controller [right] not configured (emergency stop pressed?)");
     return;
   }
 
@@ -351,7 +351,12 @@ void callbackHandlerRtqResponse(const fmMsgs::serial::ConstPtr& msg)
   double battery_volts = 0;
   double rtq_ver = 0;
 
-  ROS_INFO("RoboteQ : '%s'",msg->data.c_str());
+  /*
+  if (vehicle_left_side)
+    ROS_INFO("Roboteq [L]: '%s'",msg->data.c_str());
+  else
+    ROS_INFO("Roboteq [R]: '%s'",msg->data.c_str());
+*/
 
   if (rtq_configured == true){
     if (sscanf(msg->data.c_str(), "CB=%d", &counter) == 1)
@@ -388,16 +393,23 @@ void callbackHandlerRtqResponse(const fmMsgs::serial::ConstPtr& msg)
     if (sscanf(msg->data.c_str(), "FID=Roboteq v%lf RCB200 09/04/2010", &rtq_ver) == 1)
     {
       if (rtq_ver == 1.2){
-        ROS_INFO("RoboteQ controller online, initializing");
+        if (vehicle_left_side)
+          ROS_INFO("Roboteq controller [left] online, initializing");
+        else
+          ROS_INFO("Roboteq controller [right] online, initializing");
+        sleep(1);
         init_rtq();
       }else{
-        ROS_ERROR("Unsupported firmware version '%lf' found on RoboteQ controller",rtq_ver);
+        ROS_ERROR("Unsupported firmware version '%lf' found on Roboteq controller",rtq_ver);
       }
     }else if(sscanf(msg->data.c_str(), "ECOFF %d", &ecoff_val) == 1){
       if (ecoff_val == 1){
         rtq_configured = true;
         rtq_watchdog_reset();
-        ROS_INFO("RoboteQ controller online, initializing done");
+        if (vehicle_left_side)
+          ROS_INFO("Roboteq controller [left] online, initializing done");
+        else
+          ROS_INFO("Roboteq controller [right] online, initializing done");
       }
     }
   }
