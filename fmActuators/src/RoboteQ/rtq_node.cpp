@@ -46,7 +46,8 @@
 #include "wiimote/LEDControl.h"
 #include "wiimote/RumbleControl.h"
 #include "wiimote/TimedSwitch.h"
-#include "joy/Joy.h"
+//#include "joy/Joy.h"
+#include "sensor_msgs/Joy.h"
 
 //#include <actionlib/client/simple_action_client.h>
 //#include <actionlib/client/terminal_state.h>
@@ -138,7 +139,7 @@ int count = 0;
 bool deadManActive = false;
 bool slowMoveActive = false;
 bool turnModeActive = false;
-void callbackHandlerDeadManBtn(const joy::Joy::ConstPtr& joy)
+void callbackHandlerDeadManBtn(const sensor_msgs::Joy::ConstPtr& joy)
 {
   //ROS_INFO("W");
 
@@ -452,7 +453,7 @@ int main(int argc, char **argv)
   my_hl_response_publisher = nh.advertise<fmMsgs::rtq>(rtq_hl_response_topic.c_str(),100);
 
   //Security
-  my_deadmanbutton_subscriber = nh.subscribe<joy::Joy> (deadmanbutton_topic.c_str(), 1, &callbackHandlerDeadManBtn);
+  my_deadmanbutton_subscriber = nh.subscribe<sensor_msgs::Joy> (deadmanbutton_topic.c_str(), 1, &callbackHandlerDeadManBtn);
   my_lamp_command_subscriber = nh.subscribe<fmMsgs::rtq_lamp_command> (rtq_lamp_command_topic.c_str(), 1, &callbackHandlerLampCommand);
 
   //LED+Rumble on wii
