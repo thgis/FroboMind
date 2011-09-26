@@ -127,9 +127,13 @@ WiiToTwist::WiiToTwist()
   local_n.param<std::string> ("subscriber_topic", subscriber_topic, "joy");
   local_n.param<std::string> ("publisher_topic", publisher_topic, "wii_cmd_vel");
 
-  x_buffer = boost::circular_buffer<double>(6);
-  y_buffer = boost::circular_buffer<double>(6);
-  z_buffer = boost::circular_buffer<double>(6);
+  // Initialize ring-buffers
+  x_buffer.set_capacity(6);
+  y_buffer.set_capacity(6);
+  z_buffer.set_capacity(6);
+  for (int i=0; i<x_buffer.capacity(); i++) x_buffer.push_back(0.0);
+  for (int i=0; i<y_buffer.capacity(); i++) y_buffer.push_back(0.0);
+  for (int i=0; i<z_buffer.capacity(); i++) z_buffer.push_back(0.0);
 
   //  Subscriber and publisher
   joy_sub = global_n.subscribe<sensor_msgs::Joy> (subscriber_topic, 10, &WiiToTwist::joyCallback, this);
@@ -144,9 +148,12 @@ void WiiToTwist::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
   z_buffer.push_back((double)joy -> axes[z_axis]);
 
   //  4th order Runge Kutta filter
-  x_acceleration = (x_buffer[0] + 2 * x_buffer[1] + 2 * x_buffer[2] + x_buffer[3]) / 6.0;
-  y_acceleration = (y_buffer[0] + 2 * y_buffer[1] + 2 * y_buffer[2] + y_buffer[3]) / 6.0;
-  z_acceleration = (z_buffer[0] + 2 * z_buffer[1] + 2 * z_buffer[2] + z_buffer[3]) / 6.0;
+  x_acceleration = (x_buffer.at(0) + 2 * x_buffer.at(1) + 2 * x_buffer.at(2) + x_buffer.at(3)) / 6.0;
+  y_acceleration = (y_buffer.at(0) + 2 * y_buffer.at(1) + 2 * y_buffer.at(2) + y_buffer.at(3)) / 6.0;
+  z_acceleration = (z_buffer.at(0) + 2 * z_buffer.at(1) + 2 * z_buffer.at(2) + z_buffer.at(3)) / 6.0;
+  //x_acceleration = (x_buffer[0] + 2 * x_buffer[1] + 2 * x_buffer[2] + x_buffer[3]) / 6.0;
+  //y_acceleration = (y_buffer[0] + 2 * y_buffer[1] + 2 * y_buffer[2] + y_buffer[3]) / 6.0;
+  //z_acceleration = (z_buffer[0] + 2 * z_buffer[1] + 2 * z_buffer[2] + z_buffer[3]) / 6.0;
 
   //  Invert values if required
   if (invert_x_axis)
