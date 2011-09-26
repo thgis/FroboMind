@@ -81,7 +81,8 @@ ros::Subscriber my_lamp_command_subscriber;
 bool vehicle_left_side = false;
 bool rtq_configured = false;
 unsigned int wii_repport_count = 0;
-unsigned int rtq_com_timer_count = 0;
+int rtq_com_timer_watchdog_count = 0;
+int rtq_com_timer_watchdog_limit = 0;
 unsigned int rtq_com_timer_slot = 0;
 int motor_command_G = 0;
 
@@ -106,6 +107,31 @@ int motor_command_G = 0;
 void init_rtq(){
   s_tx_msg_.data = "^ECHOF 1\r";
   my_command_publisher.publish(s_tx_msg_);
+}
+
+void rtq_watchdog_reset(){
+  rtq_com_timer_watchdog_count = 0;
+}
+
+void rtq_watchdog(){
+
+  rtq_com_timer_watchdog_count++;
+
+  if(rtq_com_timer_watchdog_count > rtq_com_timer_watchdog_limit){
+
+    rtq_configured = false;
+
+    if (vehicle_left_side)
+      ROS_WARN("Watchdog triggered for Roboteq controller [left] - declaring emergency stop!");
+    else
+      ROS_WARN("Watchdog triggered for Roboteq controller [right] - declaring emergency stop!");
+
+    //TODO: Raise emergency stop !
+
+    // Reset watchdog so we are ready to re-activate
+    rtq_watchdog_reset();
+  }
+
 }
 
 int count = 0;
@@ -178,10 +204,14 @@ void rtqComTimerCallback(const ros::TimerEvent& e)
 
   //Dont send anything if the roboteq is not yet configured
   if (rtq_configured == false ){
-    ROS_INFO("rtq_not configured");
+    if (vehicle_left_side)
+      ROS_INFO("Roboteq controller [left] not configured (emergency stop pressed?)");
+    else
+      ROS_INFO("Roboteq controller [right] not configured (emergency stop pressed?)");
     return;
   }
 
+  rtq_watchdog();
 
   // Put each roboteq command into its own slot pr. cycletime
   //ROS_INFO("rtqComTimerCallback %d", rtq_com_timer_slot);
@@ -235,6 +265,7 @@ void rtqComTimerCallback(const ros::TimerEvent& e)
 }
 
 
+// Incoming commands from the vehicle inverse kinemaics node
 void callbackHandlerHlCmd(const fmMsgs::rtq_command::ConstPtr &cmd){
 
   //ROS_INFO_THROTTLE(0.5,"RTQ got TrackSpeed %lf",cmd->TrackSpeed);
@@ -309,6 +340,7 @@ void callbackHandlerHlCmd(const fmMsgs::rtq_command::ConstPtr &cmd){
 
 }*/
 
+//Handles strings (ended by newline) received from the serial port
 void callbackHandlerRtqResponse(const fmMsgs::serial::ConstPtr& msg)
 {
   // simple attempt to parse with scanf
@@ -325,36 +357,46 @@ void callbackHandlerRtqResponse(const fmMsgs::serial::ConstPtr& msg)
     {
       if (vehicle_left_side) counter=-counter;
       rtq_msg.BrushlessCounter = counter;
+      rtq_watchdog_reset();
     }
 
     else if (sscanf(msg->data.c_str(), "CBR=%d", &counter_relative) == 1)
     {
       if (vehicle_left_side) counter_relative=-counter_relative;
       rtq_msg.BrushlessCounterRelative = counter_relative;
+      rtq_watchdog_reset();
     }
 
     else if (sscanf(msg->data.c_str(), "M=%d", &ampere) == 1)
     {
       if (vehicle_left_side) ampere=-ampere;
       rtq_msg.BatteryAmpere = ampere;
+      rtq_watchdog_reset();
     }
 
     else if (sscanf(msg->data.c_str(), "V=%lf", &battery_volts) == 1)
     {
       //ROS_INFO("Got volts %f", battery_volts);
       rtq_msg.BatteryVoltage = battery_volts / 10.0;
+      rtq_watchdog_reset();
     }
   }
-  else //if rtq_configured == false
+  else if (rtq_configured == false)
   {
+    int ecoff_val = 0;
     if (sscanf(msg->data.c_str(), "FID=Roboteq v%lf RCB200 09/04/2010", &rtq_ver) == 1)
     {
       if (rtq_ver == 1.2){
         ROS_INFO("RoboteQ controller online, initializing");
         init_rtq();
-        rtq_configured = true;
       }else{
         ROS_ERROR("Unsupported firmware version '%lf' found on RoboteQ controller",rtq_ver);
+      }
+    }else if(sscanf(msg->data.c_str(), "ECOFF %d", &ecoff_val) == 1){
+      if (ecoff_val == 1){
+        rtq_configured = true;
+        rtq_watchdog_reset();
+        ROS_INFO("RoboteQ controller online, initializing done");
       }
     }
   }
@@ -381,7 +423,7 @@ int main(int argc, char **argv)
   std::string rtq_lamp_command_topic;
 
   /* initialize ros usage */
-  ros::init(argc, argv, "vic_actuator_rtq");
+  ros::init(argc, argv, "Roboteq node");
 
   /* nodehandlers */
   ros::NodeHandle nh; //global
@@ -391,10 +433,11 @@ int main(int argc, char **argv)
   //n.param<std::string> ("device", device, "/dev/ttyS0");
   n.param<std::string>("rtq_command_topic", rtq_command_topic, "S0_tx_msg"); //we publish to the serial interface node
   n.param<std::string>("rtq_hl_command_topic", rtq_hl_command_topic, "rtq_msg"); //we subscribe to some output from a kinematics node
-  n.param<std::string>("rtq_response_topic", rtq_response_topic, "S0_rx_msg"); //we subscribe to the response from the RoboteQ controller box
-  n.param<std::string>("rtq_hl_response_topic", rtq_hl_response_topic, "rtq_response_msg"); //we the response from
+  n.param<std::string>("rtq_response_topic", rtq_response_topic, "S0_rx_msg"); //we subscribe to the response from the Roboteq controller box
+  n.param<std::string>("rtq_hl_response_topic", rtq_hl_response_topic, "rtq_response_msg"); //we publish the response from the Rooteq
   n.param<std::string>("rtq_vehicle_side", rtq_vehicle_side, "none"); //we subscribe to the response from the rooteq controller
   n.param<double>("rtq_com_cycletime",rtq_com_cycletime, 1.0); //cycle time in seconds
+  n.param<int>("rtq_com_timer_watchdog_limit",rtq_com_timer_watchdog_limit, 10); //cycle maximum number of com cycles without data from the roboteq controller, before emergencystop is raised
   n.param<std::string>("deadmanbutton_topic", deadmanbutton_topic, "deadmanbutton_topic");
   n.param<std::string>("rtq_lamp_command_topic",rtq_lamp_command_topic,"rtq_lamp_command_topic");
   //n.param<std::string>("wiimote_rumble_led_topic",wiimote_rumble_led_topic,"wiimote_rumble_led_topic");
@@ -419,7 +462,7 @@ int main(int argc, char **argv)
   //Com is handeled from a timer so RS232 bandwidth to RoboTeQ can be controlled
   command_callback_timer = n.createTimer(ros::Duration(rtq_com_cycletime), rtqComTimerCallback);
 
-  ROS_INFO("RTQ_node rtq_com_cycletime is %f", rtq_com_cycletime);
+  ROS_INFO("Roboteq node rtq_com_cycletime is %f", rtq_com_cycletime);
 
   if (rtq_vehicle_side == "left"){
   	vehicle_left_side = true;
@@ -429,7 +472,7 @@ int main(int argc, char **argv)
   	//ROS_INFO("RTQ_node is right side");
   }else{
   	vehicle_left_side = false;
-  	ROS_WARN("RTQ_node don't know what it is, invalid parameter [%s]",rtq_vehicle_side.c_str());
+  	ROS_WARN("RTQ_node don't know what side it is, invalid parameter [%s]",rtq_vehicle_side.c_str());
   }
 
   // Ensure that serial node is up at running so the initialization string i sent to RTQ controller
@@ -446,12 +489,12 @@ int main(int argc, char **argv)
 
 
   // Play with the WII LED's
-
+/*
   while ( ! my_wiimote_leds_publisher.getNumSubscribers() ){
           ROS_WARN_THROTTLE(1,"Waiting for to WiiMote to get online");
     }
 
-/*  // --- static ---
+  // --- static ---
   wiimote::TimedSwitch ts_on;
   ts_on.switch_mode=wiimote::TimedSwitch::ON;
   wiimote::TimedSwitch ts_off;

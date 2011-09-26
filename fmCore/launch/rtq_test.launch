@@ -33,7 +33,7 @@
 			<param name="rtq_lamp_command_topic" value="/rtq_lamp_command_left" />
 		</node>
 
-		<node pkg="fmActuators" name="my_rtq_node_righ" type="roboteq_node" output="screen">
+		<node pkg="fmActuators" name="my_rtq_node_right" type="roboteq_node" output="screen">
 			<param name="rtq_command_topic" value="/fmBSP/S1_tx" />
 			<!--<param name="rtq_hl_command_topic" value="rtq_command" />-->
 			<!--<param name="rtq_hl_command_topic" value="/wiimote/state" />-->
@@ -62,7 +62,7 @@
 		</node>
 
 
-		<node pkg="fmExtractors" name="my_wiimote_to_twist" type="wiimote_to_twist" output="screen">
+		<node pkg="fmHMI" name="my_wiimote_to_twist" type="wiimote_to_twist" output="screen">
 			<param name="max_angular_velocity" value="3.58" />
 			<param name="max_linear_velocity" value="2.7" />
 			<param name="x_axis" value="1" />
@@ -74,7 +74,7 @@
 
  	</group>
 
-    <node pkg="wiimote" type="wiimote_node.py" output="screen" name="armadillo_wii"></node>
+    <node pkg="wiimote" type="wiimote_node.py" output="screen" name="armadillo_wii" respawn="true"></node>
 
 	<!-- <node pkg="topic_tools" type="throttle" output="screen" name="rtq_command_throttle"> -->
 	<!-- </node> -->
