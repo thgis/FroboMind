@@ -1,5 +1,9 @@
 <launch>
 	<group ns="fmSensors">
+   	 	<node pkg="fmSensors" name="gps_parser" type="gps_node">
+		    	<param name="subscribe_topic_id" value="/fmBSP/gps_rx" />	
+			<param name="publish_topic_id" value="/fmSensors/gpgga_msg" />	 
+		</node>
 	</group>
 
 	<group ns="fmExtractors">
@@ -67,6 +71,12 @@
 			<param name="subscriber_topic" value="motor_right_tx" />	
 			<param name="device" value="/dev/ttyS1" />	
 			<param name="baudrate" value="115200" />
+		</node>
+		<node pkg="fmBSP" name="COM3" type="serial_node" output="screen" >
+			<param name="publisher_topic" value="gps_rx" />	 
+			<param name="subscriber_topic" value="gps_tx" />	
+			<param name="device" value="/dev/ttyUSB0" />	
+			<param name="baudrate" value="4800" />
 		</node>
 	</group>
 </launch>
