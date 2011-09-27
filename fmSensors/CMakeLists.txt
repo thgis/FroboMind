@@ -22,6 +22,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_gensrv()
 
 rosbuild_add_executable(sduimu_node src/global_sensors/sduimu_node.cpp)
+rosbuild_add_executable(gps_node src/global_sensors/gps_node.cpp)
 rosbuild_add_executable(lms111_node src/local_sensors/lms111_node.cpp)
 
 include_directories(/usr/include/)

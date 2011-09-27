@@ -1,0 +1,11 @@
+Header header
+string time
+float64 lat
+float64 lon
+uint8 fix
+uint8 sat
+float64 hdop
+float64 alt
+float64 geoid_height
+uint16 dgps_time
+uint32 dgps_stat_id
