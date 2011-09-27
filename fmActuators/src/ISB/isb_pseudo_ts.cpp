@@ -1,4 +1,4 @@
-#include "isb_ts.h"
+#include "isb_pseudo_ts.h"
 
 void ISBTS::resetControllerVariables() {
 

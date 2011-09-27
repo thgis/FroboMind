@@ -13,7 +13,7 @@
 #define ISBTS_H_
 
 #define ISBTS_CAN_TIMEOUT_TICKS 100
-#define ISB_TS_CAN_ID 0x07
+#define ISB_TS_CAN_ID 0x05
 
 union ISBTS_uLong {
 	unsigned char byte[4];

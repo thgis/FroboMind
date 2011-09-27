@@ -35,7 +35,7 @@
 *************************************************************************************/
 #include "ros/ros.h"
 #include "fmMsgs/can.h"
-#include "isb_ts.h"
+#include "isb_pseudo_ts.h"
 
 
 ros::Timer tsTimer;
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 
   isb_ts.can_tx_pub = nh.advertise<fmMsgs::can> (publisher_topic.c_str(), 1);
 
-  tsTimer = nh.createTimer(ros::Duration(0.1), isbTSCallback);
+  tsTimer = nh.createTimer(ros::Duration(0.01), isbTSCallback);
 
   ros::spin();
 
