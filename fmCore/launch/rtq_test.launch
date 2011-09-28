@@ -5,14 +5,14 @@
 		<node pkg="fmBSP" name="COM1" type="serial_node" output="screen" >
 			<param name="publisher_topic" value="S0_rx" />	 
 			<param name="subscriber_topic" value="S0_tx" />	
-			<param name="device" value="/dev/ttyUSB1" />	
+			<param name="device" value="/dev/ttyS1" />	
 			<param name="baudrate" value="115200" />
 		</node>
 
 		<node pkg="fmBSP" name="COM2" type="serial_node" output="screen" >
 			<param name="publisher_topic" value="S1_rx" />	 
 			<param name="subscriber_topic" value="S1_tx" />	
-			<param name="device" value="/dev/ttyUSB0" />	
+			<param name="device" value="/dev/ttyS0" />	
 			<param name="baudrate" value="115200" />
 		</node>
 
@@ -72,9 +72,9 @@
 			<param name="publisher_topic" value="/wii_cmd_vel" />
 		</node>
 
- 	</group
->T
-    <node pkg="wiimote" type="wiimote_node.py" output="screen" name="armadillo_wii" respawn="true"></node>
+ 	</group>
+
+	<node pkg="wiimote" type="wiimote_node.py" output="screen" name="armadillo_wii" respawn="true"></node>
 
 	<!-- <node pkg="topic_tools" type="throttle" output="screen" name="rtq_command_throttle"> -->
 	<!-- </node> -->
