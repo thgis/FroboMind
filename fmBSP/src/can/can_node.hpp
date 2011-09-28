@@ -73,7 +73,7 @@ public:
     can_rx_publisher_ = nh_.advertise<fmMsgs::can> (publisher_topic_.c_str(), 1);
     can_tx_subscriber_ = nh_.subscribe(subscriber_topic_.c_str(), 1, &VicCan::write, this);
 
-    ROS_WARN("%s", device_.c_str());
+    ROS_INFO("%s", device_.c_str());
 
     if ((fd_ = open(device_.c_str(), O_RDWR )) < 0)
     {
@@ -91,6 +91,8 @@ public:
 
   void write(const fmMsgs::can::ConstPtr& msg)
   {
+	  ROS_INFO("write");
+
     canmsg_t tx_;
 
     tx_.flags = msg->flags;

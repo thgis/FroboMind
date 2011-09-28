@@ -1,0 +1,61 @@
+<launch>
+
+	<node pkg="vic_interfaces" name="can0" type="can_node"  output="screen">
+	    <param name="device" value="/dev/can0" />	
+	    <param name="publisher_topic" value="can0_rx" />
+	    <param name="subscriber_topic" value="can0_tx" />
+	</node>
+
+	<node pkg="vic_interfaces" name="can1" type="can_node" output="screen">
+	    <param name="device" value="/dev/can1" />	
+	    <param name="publisher_topic" value="can1_rx" />
+	    <param name="subscriber_topic" value="can1_tx" />
+	</node>
+
+	<node pkg="vic_sensors" name="isb_acc_node" type="isb_acc_node" output="screen">
+		<param name="publisher_topic" value="/can0_tx" />
+		<param name="subscriber_topic" value="/can0_rx" />
+		<param name="acc_1_publisher_topic" value="/isb_acc_1" />
+		<param name="acc_2_publisher_topic" value="/isb_acc_2" />
+		<param name="acc_3_publisher_topic" value="/isb_acc_3" />
+		<param name="acc_4_publisher_topic" value="/isb_acc_4" />
+		<param name="acc_5_publisher_topic" value="/isb_acc_5" />
+		<param name="acc_6_publisher_topic" value="/isb_acc_6" />	
+	</node> 
+
+	<node pkg="vic_sensors" name="isb_us_node" type="isb_us_node" output="screen">
+	</node>
+
+	<node pkg="vic_sensors" name="isb_claas_isobus_node" type="isb_claas_isobus_node" output="screen">
+	</node>
+
+	<node pkg="vic_estimators" name="isb_boom_pose_estimator" type="isb_boom_pose_estimator" output="screen">
+	</node>
+
+	<node pkg="vic_base" name="isb_spm_node" type="isb_spm_node"  output="screen">
+	</node>
+
+	<node pkg="m4atx" name="m4atx" type="m4atx"  output="screen">
+	</node> 
+
+	<node pkg="vic_base" name="isb_ts_node" type="isb_ts_node"  output="screen">
+		<param name="publisher_topic" value="/can0_tx" />
+		<param name="logstate" type="bool" value="false" />
+		<param name="resettimer" type="bool" value="false" />
+	</node>
+	
+ 	<node pkg="usb_cam" type="usb_cam_node" name="cam">
+        	<param name="video_device" value="/dev/video0"/>
+        	<param name="pixel_format" value="yuyv"/>
+    	</node>
+	
+	<node pkg="tf" type="static_transform_publisher" name="acc2_broadcaster" args="0 -1 0 0 0 3.14159265 boom_link acc2_link 10" />
+	<node pkg="tf" type="static_transform_publisher" name="acc3_broadcaster" args="0 -0.5 0 1.57079633 -1.57079633 0  boom_link acc_3_link 10" />
+	<node pkg="tf" type="static_transform_publisher" name="acc5_broadcaster" args="0 0.5 0 -1.57079633 1.57079633 0  boom_link acc5_link 10" />
+	<node pkg="tf" type="static_transform_publisher" name="acc6_broadcaster" args="0 1 0 0 0 3.14159265 boom_link acc6_link 10" />
+
+	<node pkg="tf" type="static_transform_publisher" name="head_camera" args="1 0 0 0 0 0 boom_link head_camera 10" />
+
+
+</launch>
+

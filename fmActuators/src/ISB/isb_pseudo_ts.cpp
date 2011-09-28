@@ -31,7 +31,7 @@ void ISBTS::resetControllerVariables() {
 
 void ISBTS::tsUpdate() {
 	ts_count_.uLong++;
-	//ROS_INFO("count %d AND as on canbus %d %d %d %d bootcount %d CB %d %d", ts_count_.uLong , ts_count_.byte[0], ts_count_.byte[1], ts_count_.byte[2], ts_count_.byte[3],ts_bootcount_.uShort,ts_bootcount_.byte[0],ts_bootcount_.byte[1]);
+	ROS_INFO_THROTTLE(1,"count %d AND as on canbus %d %d %d %d bootcount %d CB %d %d", ts_count_.uLong , ts_count_.byte[0], ts_count_.byte[1], ts_count_.byte[2], ts_count_.byte[3],ts_bootcount_.uShort,ts_bootcount_.byte[0],ts_bootcount_.byte[1]);
 	processCanTxEvent();
 }
 

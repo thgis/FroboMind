@@ -1,0 +1,102 @@
+<launch>
+	<group ns="fmSensors">
+   	 	<node pkg="fmSensors" name="gps_parser" type="gps_node">
+		    	<param name="subscribe_topic_id" value="/fmBSP/gps_rx" />	
+			<param name="publish_topic_id" value="/fmSensors/gpgga_msg" />	 
+		</node>
+	</group>
+
+	<group ns="fmExtractors">
+		    <node pkg="fmExtractors" type="lidar_row_detector" name="lidar_row_detector" /> 
+	</group>
+
+	<group ns="fmProcessors">
+		<node pkg="fmProcessors" type="husmands_kalman" name="kf_rows" /> 
+	</group>
+
+ 	<group ns="fmDecisionMakers">
+		<node pkg="fmDecisionMakers" type="BS" name="behaviour_selector" />
+	</group>
+
+	<group ns="fmExecutors">
+	</group>
+
+	<group ns="fmControllers">
+		<node pkg="fmControllers" type="IN_ROW_NAV" name="in_row_navigator" output="screen">  
+ 			<param name="maize_sub" value="/fmProcessors/kf_rows/kalman_row_estimate" />
+		</node>
+	</group>
+
+ 	<group ns="fmActuators">
+		<node pkg="fmActuators" name="roboteq_node_left" type="roboteq_node">
+			<param name="rtq_command_topic" value="/fmBSP/motor_left_tx" />
+			<param name="rtq_hl_command_topic" value="/fmKinematics/rtq_command_left" />
+			<param name="rtq_hl_response_topic" value="/rtq_response_left" />
+			<param name="rtq_resnponse_topic" value="/fmBSP/motor_left_rx" />
+			<param name="rtq_vehicle_side" value="left" />
+			<param name="rtq_com_cycletime" value="0.05" />
+			<param name="deadmanbutton_topic" value="/joy"/>
+		</node>
+
+		<node pkg="fmActuators" name="roboteq_node_right" type="roboteq_node" >
+			<param name="rtq_command_topic" value="/fmBSP/motor_right_tx" />
+			<!--<param name="rtq_hl_command_topic" value="/rtq_command" />-->
+			<!--<param name="rtq_hl_command_topic" value="/wiimote/state" />-->
+			<param name="rtq_hl_command_topic" value="/fmKinematics/rtq_command_right" />
+			<param name="rtq_hl_response_topic" value="/rtq_response_right" />
+			<param name="rtq_response_topic" value="/fmBSP/motor_right_rx" />
+			<param name="rtq_vehicle_side" value="right" />
+			<param name="rtq_com_cycletime" value="0.05" />
+			<param name="deadmanbutton_topic" value="/joy"/>
+		</node>
+
+		<node pkg="fmActuators" name="isb_ts_cam_trigger" type="isb_cam_trigger"  output="screen">
+		      <param name="publisher_topic" value="/fmBSP/can0_tx" />
+		      <param name="logstate" type="bool" value="false" />
+		      <param name="resettimer" type="bool" value="false" />
+		</node>
+
+
+ 	</group>
+
+ 	<group ns="fmKinematics">
+		<node pkg="fmKinematics" name="armadillo_ifk" type="armadillo_ifk">
+			<param name="hl_subscriber_topic" value="/cmd_vel"/>
+			<param name="ll_publisher_topic_left" value="/fmKinematics/rtq_command_left" />
+			<param name="ll_publisher_topic_right" value="/fmKinematics/rtq_command_right" />
+		</node>
+	</group>
+
+	<group ns="fmBSP">
+		<node pkg="fmBSP" name="COM1" type="serial_node" output="screen" >
+			<param name="publisher_topic" value="motor_left_rx" />	 
+			<param name="subscriber_topic" value="motor_left_tx" />	
+			<param name="device" value="/dev/ttyS0" />	
+			<param name="baudrate" value="115200" />
+		</node>
+		<node pkg="fmBSP" name="COM2" type="serial_node" output="screen" >
+			<param name="publisher_topic" value="motor_right_rx" />	 
+			<param name="subscriber_topic" value="motor_right_tx" />	
+			<param name="device" value="/dev/ttyS1" />	
+			<param name="baudrate" value="115200" />
+		</node>
+
+		<node pkg="fmBSP" name="can0" type="can_node"  output="screen">
+		      <param name="device" value="/dev/can1" />	
+		      <param name="publisher_topic" value="can0_rx" />
+		      <param name="subscriber_topic" value="can0_tx" />
+		</node>
+
+
+		<!--<node pkg="fmBSP" name="COM3" type="serial_node" output="screen" >-->
+		<!--	<param name="publisher_topic" value="gps_rx" />	 -->
+		<!--	<param name="subscriber_topic" value="gps_tx" /> -->	
+		<!--	<param name="device" value="/dev/ttyUSB0" />	-->
+		<!--	<param name="baudrate" value="4800" />-->
+		<!--</node>-->
+
+
+
+	</group>
+</launch>
+
