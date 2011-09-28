@@ -5,6 +5,7 @@
 #include "fmMsgs/gpgga.h"
 #include "boost/tokenizer.hpp"
 #include "boost/lexical_cast.hpp"
+#include <boost/algorithm/string.hpp>
 
 #define DEG2RAD M_PI/180.0
 
@@ -15,51 +16,64 @@ fmMsgs::gpgga gpgga_msg;
 
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
+double nmea_to_deg(double pos, std::string dir) {
+	pos = pos / 100;
+	int dd = floor(pos);
+	double mm = (pos - dd) * 100;
+	double res = dd + (mm / 60);
+	if (dir == "S" || dir == "W") {
+		res = 0 - res;
+	}
+	return res;
+}
+
 void gpsCallback(const fmMsgs::serial::ConstPtr& msg)
 {
+	std::string nmeadata = msg->data;
+	boost::replace_all(nmeadata, ",,", ", ,"); // needed to not drop any tokens.
+	int count = 0;
+ 	boost::char_separator<char> sep(",");
+	tokenizer::iterator tok_iter; 
+	tokenizer tokens(nmeadata, sep);
 
-  int count = 0;
-  boost::char_separator<char> sep("*,");
-  tokenizer::iterator tok_iter; 
-  tokenizer tokens(msg->data, sep);
+	// count the number of tokens
+//	for (tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter) {
+// 		count ++;
+//	}
+	try {
+		tok_iter = tokens.begin();
+		if (tok_iter != tokens.end())
+		{
+			std::string nmea_id = boost::lexical_cast<std::string>(*tok_iter++);
+			if (nmea_id == "$GPGGA") {  
+				double nmea_lat;
+				double nmea_lon;
+				std::string nmea_lat_hem;
+				std::string nmea_lon_hem;
+//				ROS_INFO("GPGGA received");
+				gpgga_msg.header.stamp = ros::Time::now();
+				gpgga_msg.time = boost::lexical_cast<std::string>(*tok_iter++);
+				nmea_lat = boost::lexical_cast<double>(*tok_iter++);
+				nmea_lat_hem = boost::lexical_cast<std::string>(*tok_iter++);
+				nmea_lon = boost::lexical_cast<double>(*tok_iter++);
+				nmea_lon_hem = boost::lexical_cast<std::string>(*tok_iter++);
+				gpgga_msg.fix = boost::lexical_cast<int>(*tok_iter++);
+				gpgga_msg.sat = boost::lexical_cast<int>(*tok_iter++);
+				gpgga_msg.hdop = boost::lexical_cast<double>(*tok_iter++);
 
+				gpgga_msg.lat = nmea_to_deg (nmea_lat, nmea_lat_hem);
+				gpgga_msg.lon = nmea_to_deg (nmea_lon, nmea_lon_hem);
 
-  for (tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter)
- 	count ++;
-
-   tok_iter = tokens.begin(); 
-  
-  if (*tok_iter == "$GPGGA")
-  {
-	*tok_iter++;
-	gpgga_msg.header.stamp = ros::Time::now();
-	gpgga_msg.time = *tok_iter;
-	*tok_iter++;
-	
-	gpgga_pub.publish(gpgga_msg);
-
-
-/*
-   *tok_iter++; //remove $RLIMU
-   
-   imu_msg.header = msg->header;
-   imu_msg.header.frame_id = frame_id;
-
-   imu_msg.linear_acceleration.x = boost::lexical_cast<int>(*tok_iter++) * 0.001 * 9.82;
-   imu_msg.linear_acceleration.y = boost::lexical_cast<int>(*tok_iter++) * 0.001 * 9.82;
-   imu_msg.linear_acceleration.z = boost::lexical_cast<int>(*tok_iter++) * 0.001 * 9.82;
-   imu_msg.angular_velocity.x = boost::lexical_cast<int>(*tok_iter++) * 0.05 * DEG2RAD;
-   imu_msg.angular_velocity.y = boost::lexical_cast<int>(*tok_iter++) * 0.05 * DEG2RAD;
-   imu_msg.angular_velocity.z = boost::lexical_cast<int>(*tok_iter++) * 0.05 * DEG2RAD;
- // ROS_INFO("Got $RLIMU");
-
-       imu_pub.publish(imu_msg);
-
-*/   
-  }
-
-
-
+				gpgga_pub.publish(gpgga_msg);
+			}
+		}
+		else {
+			ROS_INFO("tok_iter problem");
+		}
+	}
+	catch(boost::bad_lexical_cast &) {
+  		ROS_WARN(("Bad lexical cast in GPS Parser! : " + msg->data).c_str());
+	}
 }
 
 int main(int argc, char **argv)
@@ -73,7 +87,7 @@ int main(int argc, char **argv)
 
   n.param<std::string> ("subscribe_topic_id", subscribe_topic_id, "fmBSP/gps_msg");
   n.param<std::string> ("publish_topic_id", publish_topic_id, "gpgga_msg");
-  n.param<std::string> ("frame_id", frame_id, "/base");
+//  n.param<std::string> ("frame_id", frame_id, "/base");
 
   ros::Subscriber sub = n.subscribe(subscribe_topic_id, 1, gpsCallback);
   gpgga_pub = n.advertise<fmMsgs::gpgga> (publish_topic_id, 1);
@@ -81,6 +95,5 @@ int main(int argc, char **argv)
   ros::spin();
 
   return 0;
-
 }
 
