@@ -1,9 +1,9 @@
 Header header
-string time
-float64 lat
-float64 lon
-uint8 fix
-uint8 sat
-float64 hdop
-float64 alt
-float64 geoid_height
+string time		# [UTC] retrieved from the GPS data
+float64 lat		# [-90;90 deg] WGS-84 latitude in decimal degrees
+float64 lon		# [-180;180 deg] WGS-84 longitude in decimal degrees
+uint8 fix		# GPS fix: 0=Invalid, 1=GPS, 2=DGPS,4=RTK fixed, 5=RTK float 
+uint8 sat		# Number of satellites in view
+float64 hdop		# Horizontal Dilution Of Precision
+float64 alt		# [m] altitude above mean sea level
+float64 geoid_height	# Mean sea level height above the WGS-84 ellipsoid
