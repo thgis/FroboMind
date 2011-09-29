@@ -1,0 +1,8 @@
+# Define the goal
+float32 move_distance_meter
+---
+# Define the result
+float32 move_distance_meter_completed
+---
+# Define a feedback message
+float32 move_distance_meter_current
