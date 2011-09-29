@@ -7,7 +7,12 @@
 	</group>
 
 	<group ns="fmExtractors">
-		    <node pkg="fmExtractors" type="lidar_row_detector" name="lidar_row_detector" /> 
+		<node pkg="fmExtractors" type="lidar_row_detector" name="lidar_row_detector" /> 
+
+   	 	<node pkg="fmExtractors" name="gps_state" type="gps_state" output="screen">
+		    	<param name="subscribe_topic_id" value="/fmSensors/gpgga_msg" />	
+			<param name="publish_topic_id" value="/fmExtractors/gps_state_msg" />	 
+		</node>
 	</group>
 
 	<group ns="fmProcessors">
