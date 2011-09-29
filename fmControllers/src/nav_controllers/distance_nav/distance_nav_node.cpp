@@ -21,11 +21,11 @@
 # THE SOFTWARE.
 #
 *****************************************************************************
-# File: in_row_node_node.cpp
-# Purpose: In-row navigation node
-# Project: Field Robot - Vehicle Interface Computer
-# Author: Søren Hundevadt Nielsen <shn@kbm.sdu.dk>
-# Created: Jun 28, 2011 Søren Hundevadt Nielsen, Source written
+# File: distance_nav_node.cpp
+# Purpose: Distance navigation node
+# Project: Field Robot - FroboMind controllers
+# Author: Anders Bøgild <andb@mmmi.sdu.dk>
+# Created: Sep 29, 2011 Anders Bøgild, Source copied and adapted from in_row_nav_node
 ****************************************************************************/
 #include "distance_nav.hpp"
 
@@ -38,13 +38,13 @@ int main(int argc, char **argv) {
 	ros::NodeHandle nh;
 	ros::NodeHandle n("~");
 
-	IN_ROW_NAV irn;
+	DistanceNavigator dn;
 
-	n.param<std::string> ("maize_sub", irn.maize_sub_top_, "/husmand/kalman_row_estimate");
-	n.param<std::string> ("twist_top", irn.twist_pub_top_, "/auto_cmd_vel");
+	n.param<std::string> ("maize_sub", dn.dist_sub_top_, "");
+	n.param<std::string> ("twist_top", dn.twist_pub_top_, "/auto_cmd_vel");
 
 	irn.twist_pub_ = nh.advertise<geometry_msgs::TwistStamped>(irn.twist_pub_top_.c_str(),1);
-	irn.maize_row_sub_ = nh.subscribe<fmMsgs::row>(irn.maize_sub_top_.c_str(),100,&IN_ROW_NAV::maizehandler, &irn);
+	//irn.maize_row_sub_ = nh.subscribe<fmMsgs::row>(irn.maize_sub_top_.c_str(),100,&IN_ROW_NAV::maizehandler, &irn);
 
 	//Handle callbacks
 	ros::spin();

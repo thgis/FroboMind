@@ -21,38 +21,38 @@
  # THE SOFTWARE.
  #
  *****************************************************************************
- # File: in_row_nav.cpp
- # Purpose: In-row navigation class
- # Project: Field Robot - Vehicle Interface Computer
- # Author: Søren Hundevadt Nielsen <shn@kbm.sdu.dk>
- # Created: Jun 28, 2011 Søren Hundevadt Nielsen, Source written
+ # File: distance_nav.cpp
+ # Purpose: Distance navigation node
+ # Project: Field Robot - FroboMind controllers
+ # Author: Anders Bøgild <andb@mmmi.sdu.dk>
+ # Created: Sep 29, 2011 Anders Bøgild, Source copied and adapted from in_row_nav
  ****************************************************************************/
 
 #include "distance_nav.hpp"
 
-IN_ROW_NAV::IN_ROW_NAV(){
-	angle_regulator = PIDRegulator(2.5,0,0);
-	distance_regulator = PIDRegulator(0.2,0,0);
+DistanceNavigator::DistanceNavigator(){
+	//angle_regulator = PIDRegulator(2.5,0,0);
+	//distance_regulator = PIDRegulator(0.2,0,0);
 }
 
-IN_ROW_NAV::~IN_ROW_NAV(){
+DistanceNavigator::~DistanceNavigator(){
 
 }
 
-void IN_ROW_NAV::maizehandler(const fmMsgs::rowConstPtr & maize_msg){
+void DistanceNavigator::distanceHandler(const fmMsgs::rowConstPtr & dist_msg){
 
-	distance_regulator_output_ = distance_regulator.update(maize_msg->error_distance,0);
-	angle_regulator_output_ = angle_regulator.update(maize_msg->error_angle,0);
+	//distance_regulator_output_ = distance_regulator.update(maize_msg->error_distance,0);
+	//angle_regulator_output_ = angle_regulator.update(maize_msg->error_angle,0);
 
 	twist_msg.header.stamp = ros::Time::now();
 	twist_msg.twist.linear.x=0.5;
-	twist_msg.twist.angular.z=angle_regulator_output_;
+	twist_msg.twist.angular.z=0; // for now we just drive in a straigt line... good luck!
 
 
 	twist_pub_.publish(twist_msg);
 
 
-	ROS_INFO("ao: %f , ae: %f",angle_regulator_output_,maize_msg->error_angle);
+	ROS_INFO("dist from gps: %f" ,dist_msg->dist);
 
 
 

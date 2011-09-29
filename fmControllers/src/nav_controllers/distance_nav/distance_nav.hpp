@@ -21,27 +21,27 @@
  # THE SOFTWARE.
  #
  *****************************************************************************
- # File: in_row_nav.h
- # Purpose: In-row navigation class
- # Project: Field Robot - Vehicle Interface Computer
- # Author: Søren Hundevadt Nielsen <shn@kbm.sdu.dk>
- # Created: Jun 28, 2011 Søren Hundevadt Nielsen, Source written
+ # File: distance_nav.hpp
+ # Purpose: Distance navigation class
+ # Project: Field Robot - FroboMind controllers
+ # Author: Anders Bøgild <andb@mmmi.sdu.dk>
+ # Created: Sep 29, 2011 Anders Bøgild, Source copied and adapted from in_row_nav
  ****************************************************************************/
 
-#ifndef IN_ROW_NAV_H_
-#define IN_ROW_NAV_H_
+#ifndef DISTANCE_NAV_H_
+#define DISTANCE_NAV_H_
 
 #include <ros/ros.h>
 #include <geometry_msgs/TwistStamped.h>
 #include "fmMsgs/row.h"
 #include "pid_regulator.h"
 
-class IN_ROW_NAV {
+class DistanceNavigator {
 
 private:
 
-	PIDRegulator angle_regulator;
-    PIDRegulator distance_regulator;
+	//PIDRegulator angle_regulator;
+    //PIDRegulator distance_regulator;
 
     geometry_msgs::TwistStamped twist_msg;
 
@@ -50,16 +50,16 @@ private:
 
 public:
 
-	ros::Subscriber maize_row_sub_;
+	ros::Subscriber dist_sub_;
 	ros::Publisher twist_pub_;
 
-	std::string maize_sub_top_;
+	std::string dist_sub_top_;
 	std::string twist_pub_top_;
 
-	void maizehandler(const fmMsgs::rowConstPtr & row_msg);
+	void distanceHandler(const fmMsgs::rowConstPtr & dist_msg);
 
-	IN_ROW_NAV();
-	virtual ~IN_ROW_NAV();
+	DistanceNavigator();
+	virtual ~DistanceNavigator();
 };
 
-#endif /* IN_ROW_NAV_H_ */
+#endif /* DISTANCE_NAV_H_ */
