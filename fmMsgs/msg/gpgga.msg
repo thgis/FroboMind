@@ -1,5 +1,6 @@
 Header header
-string time		# [UTC] retrieved from the GPS data
+time time_recv		# Data received time stamp 
+string time		# [UTC] Retrieved from the GPS data
 float64 lat		# [-90;90 deg] WGS-84 latitude in decimal degrees
 float64 lon		# [-180;180 deg] WGS-84 longitude in decimal degrees
 uint8 fix		# GPS fix: 0=Invalid, 1=GPS, 2=DGPS,4=RTK fixed, 5=RTK float 
