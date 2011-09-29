@@ -40,8 +40,10 @@ int main(int argc, char **argv) {
 
 	DistanceNavigator dn;
 
-	n.param<std::string> ("maize_sub", dn.dist_sub_top_, "");
-	n.param<std::string> ("twist_top", dn.twist_pub_top_, "/auto_cmd_vel");
+	dn.server(nh, "move_distance", boost::bind(&dn.executeMoveDist, _1, &dn.server),false);
+
+	//n.param<std::string> ("maize_sub", dn.dist_sub_top_, "");
+	//n.param<std::string> ("twist_top", dn.twist_pub_top_, "/auto_cmd_vel");
 
 	dn.twist_pub_ = nh.advertise<geometry_msgs::TwistStamped>(dn.twist_pub_top_.c_str(),1);
 	//irn.maize_row_sub_ = nh.subscribe<fmMsgs::row>(irn.maize_sub_top_.c_str(),100,&IN_ROW_NAV::maizehandler, &irn);

@@ -19,12 +19,13 @@
 	</group>
 
 	<group ns="fmExecutors">
+	       <node pkg="fmExecutors" type="cam_tester" name="cam_test_executor" output="screen">  
+	       </node>
 	</group>
 
 	<group ns="fmControllers">
-		<node pkg="fmControllers" type="IN_ROW_NAV" name="in_row_navigator" output="screen">  
- 			<param name="maize_sub" value="/fmProcessors/kf_rows/kalman_row_estimate" />
-		</node>
+	       <node pkg="fmControllers" type="distance_nav" name="distance_navigator" output="screen">  
+	       </node>
 	</group>
 
  	<group ns="fmActuators">

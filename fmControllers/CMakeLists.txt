@@ -24,7 +24,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 #uncomment if you have defined messages
-#rosbuild_genmsg()
+rosbuild_genmsg()
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
@@ -32,7 +32,7 @@ rosbuild_add_executable(IN_ROW_NAV src/nav_controllers/in_row_nav/in_row_nav_nod
 rosbuild_add_executable(IN_ROW_NAV src/nav_controllers/in_row_nav/in_row_nav.cpp)
 rosbuild_add_executable(IN_ROW_NAV src/nav_controllers/in_row_nav/pid_regulator.cpp)
 
-rosbuild_add_executable(odometry_nav 
+rosbuild_add_executable(distance_nav 
   src/nav_controllers/distance_nav/distance_nav_node.cpp
   src/nav_controllers/distance_nav/distance_nav.cpp
   src/nav_controllers/distance_nav/pid_regulator.cpp

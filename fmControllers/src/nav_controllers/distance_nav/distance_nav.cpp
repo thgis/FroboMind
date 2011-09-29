@@ -33,9 +33,22 @@
 DistanceNavigator::DistanceNavigator(){
 	//angle_regulator = PIDRegulator(2.5,0,0);
 	//distance_regulator = PIDRegulator(0.2,0,0);
+
+
+
 }
 
 DistanceNavigator::~DistanceNavigator(){
+
+}
+
+void DistanceNavigator::executeMoveDist(const fmControllers::MoveDistActionConstPtr& goal, Server* as){
+
+	ROS_INFO("Got MoveDistAction");
+
+	//Make the requested action happend
+
+	as->setSucceeded();
 
 }
 

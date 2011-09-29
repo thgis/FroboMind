@@ -36,6 +36,12 @@
 #include "fmMsgs/row.h"
 #include "pid_regulator.h"
 
+#include <actionlib/server/simple_action_server.h>
+#include <fmControllers/MoveDistAction.h>
+
+typedef actionlib::SimpleActionServer<fmControllers::MoveDistAction> Server;
+
+
 class DistanceNavigator {
 
 private:
@@ -55,6 +61,10 @@ public:
 
 	std::string dist_sub_top_;
 	std::string twist_pub_top_;
+
+	Server server;
+
+	void executeMoveDist(const fmControllers::MoveDistActionConstPtr& goal, Server* as);
 
 	void distanceHandler(const fmMsgs::rowConstPtr & dist_msg);
 
