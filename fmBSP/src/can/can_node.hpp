@@ -91,7 +91,7 @@ public:
 
   void write(const fmMsgs::can::ConstPtr& msg)
   {
-	  ROS_INFO("write");
+	//ROS_INFO("write");
 
     canmsg_t tx_;
 
