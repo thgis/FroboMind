@@ -52,7 +52,7 @@ void DistanceNavigator::distanceHandler(const fmMsgs::rowConstPtr & dist_msg){
 	twist_pub_.publish(twist_msg);
 
 
-	ROS_INFO("dist from gps: %f" ,dist_msg->dist);
+	//ROS_INFO("dist from gps: %f" ,dist_msg->dist);
 
 
 

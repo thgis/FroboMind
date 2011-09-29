@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 	n.param<std::string> ("maize_sub", dn.dist_sub_top_, "");
 	n.param<std::string> ("twist_top", dn.twist_pub_top_, "/auto_cmd_vel");
 
-	irn.twist_pub_ = nh.advertise<geometry_msgs::TwistStamped>(irn.twist_pub_top_.c_str(),1);
+	dn.twist_pub_ = nh.advertise<geometry_msgs::TwistStamped>(dn.twist_pub_top_.c_str(),1);
 	//irn.maize_row_sub_ = nh.subscribe<fmMsgs::row>(irn.maize_sub_top_.c_str(),100,&IN_ROW_NAV::maizehandler, &irn);
 
 	//Handle callbacks

@@ -11,6 +11,8 @@
   <depend package="fmMsgs"/>
   <depend package="fmBSP"/>
   <depend package="geometry_msgs"/>
+  <depend package="actionlib"/>
+  <depend package="actionlib_msgs"/>
 </package>
 
 
