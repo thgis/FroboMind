@@ -7,5 +7,3 @@ uint8 sat
 float64 hdop
 float64 alt
 float64 geoid_height
-uint16 dgps_time
-uint32 dgps_stat_id
