@@ -1,0 +1,16 @@
+<package>
+  <description brief="fmExecutors">
+
+     fmExecutors
+
+  </description>
+  <author>Anders Bogild</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url></url>
+  <depend package="roscpp"/>
+  <depend package="fmMsgs"/>
+
+</package>
+
+
