@@ -50,6 +50,9 @@ void gpsCallback(const fmMsgs::serial::ConstPtr& msg)
 				// save current time
 				gpgga_msg.header.stamp = ros::Time::now();
 
+				// save data received time
+				gpgga_msg.time_recv = msg->header.stamp;
+
 				// import data from the nmea string
 				gpgga_msg.time = boost::lexical_cast<std::string>(*tok_iter++);
 				nmea_lat = boost::lexical_cast<double>(*tok_iter++);
@@ -91,7 +94,7 @@ int main(int argc, char **argv)
 	std::string publish_topic_id;
 
 	n.param<std::string> ("subscribe_topic_id", subscribe_topic_id, "fmBSP/gps_msg");
-	n.param<std::string> ("publish_topic_id", publish_topic_id, "gpgga_msg");
+	n.param<std::string> ("publish_topic_id", publish_topic_id, "fmSensors/gpgga_msg");
 //	n.param<std::string> ("frame_id", frame_id, "/base");
 
 	ros::Subscriber sub = n.subscribe(subscribe_topic_id, 1, gpsCallback);
